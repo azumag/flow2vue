@@ -24,8 +24,7 @@ class Generator
     FileUtils.cp_r('.scaffold', 'dst')
   end
 
-  def generate_with(page)
-    # routes
+  def generate_route(page)
     routes_file = "dst/src/routes.js"
     routes = File.read(routes_file)
 
@@ -36,7 +35,9 @@ class Generator
     routes.gsub!(/},\n]/, components)
 
     File.write(routes_file, import + routes)
+  end
 
+  def generate_with(page)
     # page
     page_file =  "dst/src/#{page.name}.vue"
     FileUtils.cp('.scaffold/src/components/page.vue', page_file)
@@ -46,7 +47,9 @@ class Generator
     pagesrc.gsub!('BODY', page.body.join) if page.body
 
     trs = page.transitions.map do |trn|
-      "<router-link to='/#{trn.downcase}'>#{trn}</router-link>"
+      next unless trn
+      # TODO: structurize
+      "<router-link to='/#{trn[1].downcase.strip}'>#{trn.first}</router-link>"
     end
     pagesrc.gsub!('===LINK===', trs.join)
 
@@ -56,21 +59,27 @@ class Generator
 end
 
 gen = Generator.new
-gen.generate_scaffold #unless File.exist?('dst')
+gen.generate_scaffold unless File.exist?('dst')
 
 pages = []
 page_scans.each do |page_scan|
   page_body = flow.scan(/^\[#{page_scan}\]$(.*?)(^\[|^\n)/m)
+  transitions = []
+  transitions << page_body.to_s.scan(/---(.*?)==>(.*?)\\n/).first
+  page_body.to_s.scan(/==>.*?\\n(.*?)\\n==>(.*?)\\n/).each do |tr|
+    transitions << tr
+  end
+
   page = Page.new(
     page_scan,
     page_body,
     page_body.to_s.scan(/DisplayName\((.*?)\)/).flatten.first,
     page_body.to_s.scan(/DisplayName\(.*?\)((.|\r|\n)*?)---/m),
-    page_body.to_s.scan(/(---|=.*?\\n)((.|\r|\n)*?)=/).map {|a| a[1] },
+    transitions
   )
   pp page
   #pp page_body.to_s.scan(/(---|=.*?\\n)((.|\r|\n)*?)=(.*?)/)
-  pp page_body.to_s.scan(/---((.|\r|\n)*?)=\>(.*?)/)
+  #gen.generate_route(page)
   gen.generate_with(page) 
 end
 
