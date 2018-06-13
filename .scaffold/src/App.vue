@@ -25,7 +25,7 @@
       </v-navigation-drawer>
       <v-toolbar color="indigo" dark fixed app>
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <v-toolbar-title >UGX Amazon FBA 相乗り配送サービス</v-toolbar-title>
+        <v-toolbar-title >APP_TITLE</v-toolbar-title>
       </v-toolbar>
       <v-content>
         <v-snackbar
