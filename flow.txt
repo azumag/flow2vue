@@ -1,0 +1,24 @@
+[Entry]
+DisplayName(EntryPage and tutorial)
+BODY
+BODY2
+---
+LinkName1
+==> Tutorial
+LinkName2
+==> Login
+
+[Tutorial]
+DisplayName(Tutorial)
+
+[Login]
+DisplayName(Login)
+(Input:email)(required)MailAddress:メールアドレス
+(Input:password)(required)Password:パスワード
+---
+ログイン
+={if:valid}=> OrderForm
+パスワードを忘れた方はこちら
+==> PasswordReset
+新規登録
+==> SignUp
