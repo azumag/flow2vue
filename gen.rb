@@ -2,11 +2,9 @@
 
 require 'fileutils'
 
-pp ARGV
-
 flow = File.read(ARGV[0])
 flow << "\n" # insert \n for easy parsing
-APP_TITLE = 'VUE_GEN_TITLE'
+APP_TITLE = ARGV[1] || 'NO TITLE'
 
 
 page_scans = flow.scan(/\[(.*)\]/).flatten
@@ -14,12 +12,13 @@ page_scans = flow.scan(/\[(.*)\]/).flatten
 class Page
   attr_accessor :name, :page_body, :forms, :display_name, :body, :transitions
   def initialize(name, page_body, forms, display_name, body, transitions)
-    @name = name
+    @name = name.delete('*')
     @page_body = page_body
     @forms = forms
     @display_name = display_name
     @body = body
     @transitions = transitions
+    @independent = name.scan(/^*/).empty?
   end
 end
 
