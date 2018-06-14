@@ -6,11 +6,8 @@ flow = File.read(ARGV[0])
 flow << "\n" # insert \n for easy parsing
 APP_TITLE = ARGV[1] || 'NO TITLE'
 
-
-page_scans = flow.scan(/\[(.*)\]/).flatten
-
 class Page
-  attr_accessor :name, :page_body, :forms, :display_name, :body, :transitions
+  attr_accessor :name, :page_body, :forms, :display_name, :body, :transitions, :independent
   def initialize(name, page_body, forms, display_name, body, transitions)
     @name = name.delete('*')
     @page_body = page_body
@@ -18,7 +15,7 @@ class Page
     @display_name = display_name
     @body = body
     @transitions = transitions
-    @independent = name.scan(/^*/).empty?
+    @independent = !name.scan(/^\*/).empty?
   end
 end
 
@@ -92,6 +89,30 @@ class Generator
 
     File.write(page_file, pagesrc)
 
+    add_navbar(page) if page.independent
+  end
+
+  def add_navbar(page)
+    page_file =  "dst/src/App.vue"
+    pagesrc = File.read(page_file)
+
+    tile = []
+    tile << "<v-list-tile @click=\"$router.push('/#{page.name.downcase}')\">"
+    tile << "<v-list-tile-action>"
+    tile << "<v-icon>link</v-icon>" # TODO
+    tile << "</v-list-tile-action>"
+    tile << "<v-list-tile-content>"
+    tile << "<v-list-tile-title>"
+    tile << "#{page.display_name}"
+    tile << "</v-list-tile-title>"
+    tile << "</v-list-tile-content>"
+    tile << "</v-list-tile>"
+    tile << "</v-list>"
+
+    pagesrc.gsub!('</v-list>', tile.join("\n"))
+
+    File.write(page_file, pagesrc)
+
   end
 end
 
@@ -101,9 +122,12 @@ gen.generate_scaffold unless File.exist?('dst')
 gen.rewrite_app_title
 gen.copy_routes
 
+page_scans = flow.scan(/\[(.*)\]/).flatten
+
 pages = []
 page_scans.each do |page_scan|
-  page_body = flow.scan(/^\[#{page_scan}\]$(.*?)(^\[|^\n)/m)
+  puts "------#{page_scan}"
+  page_body = flow.scan(/^\[#{page_scan.gsub('*','\*')}\]$(.*?)(^\[|^\n)/m)
   transitions = []
  
   ## parse transitions
@@ -139,6 +163,9 @@ page_scans.each do |page_scan|
     body << line
   end
 
+
+  #pp page_body.to_s.scan(/Title\((.*?)\)/).flatten.first
+
   page = Page.new(
     page_scan,
     page_body,
@@ -149,6 +176,8 @@ page_scans.each do |page_scan|
   )
   gen.generate_route(page)
   gen.generate_with(page) 
+
+  pp page
 end
 
 
