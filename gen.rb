@@ -20,41 +20,41 @@ class Page
 end
 
 class Generator
+  DST_DIR = 'dst'
+  SRC_DIR = '.scaffold'
+
+  APP_FILE = '/src/App.vue'
+  ROUTES_FILE = '/src/routes.js'
+  PAGE_TEMPLATE_FILE = '/src/components/page.vue'
+
   def generate_scaffold
-    FileUtils.rm_r('dst')
-    FileUtils.cp_r('.scaffold', 'dst')
+    FileUtils.rm_r(DST_DIR)
+    FileUtils.cp_r(SRC_DIR, DST_DIR)
   end
 
   def rewrite_app_title
-    app_file = 'dst/src/App.vue'
-    FileUtils.cp('.scaffold/src/App.vue', app_file)
-    app = File.read(app_file)
+    FileUtils.cp(SRC_DIR + APP_FILE, DST_DIR + APP_FILE)
+    app = File.read(DST_DIR + APP_FILE)
     app.gsub!('APP_TITLE', APP_TITLE)
-    File.write(app_file, app)
+    File.write(DST_DIR + APP_FILE, app)
   end
 
   def copy_routes
-    routes_file = "dst/src/routes.js"
-    FileUtils.cp('.scaffold/src/routes.js', routes_file)
+    FileUtils.cp(SRC_DIR + ROUTES_FILE, DST_DIR + ROUTES_FILE)
   end
 
-  def generate_route(page)
-    routes_file = "dst/src/routes.js"
-    routes = File.read(routes_file)
-
+  def add_routes(page)
+    routes = File.read(DST_DIR + ROUTES_FILE)
     import = "import #{page.name} from './#{page.name}';\n"
-
     components = "\n},\n{\n path: '/#{page.name.downcase}', component: #{page.name} },\n]"
-
     routes.gsub!(/\},\n\]/, components)
-
-    File.write(routes_file, import + routes)
+    File.write(DST_DIR + ROUTES_FILE, import + routes)
   end
 
   def generate_with(page)
     # page
-    page_file =  "dst/src/#{page.name}.vue"
-    FileUtils.cp('.scaffold/src/components/page.vue', page_file)
+    page_file =  DST_DIR + "/src/#{page.name}.vue"
+    FileUtils.cp(SRC_DIR + PAGE_TEMPLATE_FILE, page_file)
     pagesrc = File.read(page_file)
     pagesrc.gsub!('page', page.name.downcase)
     pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
@@ -174,7 +174,7 @@ page_scans.each do |page_scan|
     body,
     transitions
   )
-  gen.generate_route(page)
+  gen.add_routes(page)
   gen.generate_with(page) 
 
   pp page
