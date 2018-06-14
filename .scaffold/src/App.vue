@@ -45,7 +45,7 @@
         <v-alert
         v-model="notificationVisible"
         :type="notificationType"
-        dismissible="true"
+        dismissible
         transition="slide-x-transition"
         >
         {{ notificationMsg }}

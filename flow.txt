@@ -1,5 +1,5 @@
 [Entry]
-DisplayName(EntryPage and tutorial)
+Title(EntryPage and tutorial)
 BODY
 BODY2
 ---
@@ -9,16 +9,16 @@ Logi--n
 ==> Login
 
 [Tutorial]
-DisplayName(Tutorial)
+Title(Tutorial)
 
 [PasswordReset]
-DisplayName(Password Reset)
+Title(Password Reset)
 
 [SignUp]
-DisplayName(snup)
+Title(snup)
 
 [Login]
-DisplayName(Login)
+Title(Login)
 (Input:email)(required)MailAddress:メールアドレス
 (Input:password)(required)Password:パスワード
 ---

@@ -2,6 +2,7 @@
   <div id="page">
     <h2>PAGE_NAME</h2>
     <p>BODY</p>
+    <p>===FORM===</p>
     ===LINK===
   </div>
 </template>

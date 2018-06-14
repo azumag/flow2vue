@@ -2,19 +2,21 @@
 
 require 'fileutils'
 
-flow = File.read('flow.txt')
+pp ARGV
+
+flow = File.read(ARGV[0])
 flow << "\n" # insert \n for easy parsing
-#puts flow
-#
 APP_TITLE = 'VUE_GEN_TITLE'
+
 
 page_scans = flow.scan(/\[(.*)\]/).flatten
 
 class Page
-  attr_accessor :name, :page_body, :display_name, :body, :transitions
-  def initialize(name, page_body, display_name, body, transitions)
+  attr_accessor :name, :page_body, :forms, :display_name, :body, :transitions
+  def initialize(name, page_body, forms, display_name, body, transitions)
     @name = name
     @page_body = page_body
+    @forms = forms
     @display_name = display_name
     @body = body
     @transitions = transitions
@@ -60,8 +62,28 @@ class Generator
     pagesrc = File.read(page_file)
     pagesrc.gsub!('page', page.name.downcase)
     pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
-    pagesrc.gsub!('BODY', page.body.join) if page.body
 
+    # BODY GENERATION
+    body = page.body.map do |line|
+      "<div>#{line}</div>"
+    end
+    pagesrc.gsub!('BODY', body.join("\n"))
+
+    # FORM GENERATION 
+    unless page.forms.flatten.empty?
+      form_src = page.forms.map do |form|
+        next if form.empty?
+        form[2] = '' unless form[2]
+        "<v-text-field v-model='#{form[3]}' label='#{form[4]}' #{form[2].delete('(').delete(')')}></v-text-field>"
+      end
+      form_src.unshift("<v-form>")
+      form_src << "</v-form>"
+      pagesrc.gsub!('===FORM===', form_src.join)
+    else
+      pagesrc.gsub!('===FORM===', '')
+    end
+
+    # TRANSITIONS GENERATION
     trs = page.transitions.map do |trn|
       next unless trn
       # TODO: structurize
@@ -83,8 +105,6 @@ gen.copy_routes
 pages = []
 page_scans.each do |page_scan|
   page_body = flow.scan(/^\[#{page_scan}\]$(.*?)(^\[|^\n)/m)
-  #pp flow
-  #pp flow.scan(/\[#{page_scan}\]\n(.*?)^\n$/m)
   transitions = []
  
   ## parse transitions
@@ -108,14 +128,24 @@ page_scans.each do |page_scan|
 
   forms = []
   page_body.join.each_line do |line|
+    forms << line.scan(/\((.*?):(.*?)\)(\(.*?\))?(.*?):(.*?)$/).flatten
+    break unless line.scan('---').empty?
+  end
 
+  body = []
+  page_body.join.each_line do |line|
+    next if line[0] == '('
+    next if line[0] == 'T'
+    break unless line.scan('---').empty?
+    body << line
   end
 
   page = Page.new(
     page_scan,
     page_body,
-    page_body.to_s.scan(/DisplayName\((.*?)\)/).flatten.first,
-    page_body.to_s.scan(/DisplayName\(.*?\)((.|\r|\n)*?)---/m),
+    forms,
+    page_body.to_s.scan(/Title\((.*?)\)/).flatten.first,
+    body,
     transitions
   )
   gen.generate_route(page)
