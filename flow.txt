@@ -3,13 +3,19 @@ DisplayName(EntryPage and tutorial)
 BODY
 BODY2
 ---
-LinkName1
+Tutor
 ==> Tutorial
-LinkName2
+Logi--n
 ==> Login
 
 [Tutorial]
 DisplayName(Tutorial)
+
+[PasswordReset]
+DisplayName(Password Reset)
+
+[SignUp]
+DisplayName(snup)
 
 [Login]
 DisplayName(Login)
