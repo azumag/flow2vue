@@ -10,7 +10,9 @@
 <script>
 export default {
   name: 'page',
-  
+  data: () => (
+    ===DATA===
+  ), 
   methods: {
     submit () {
       if (this.$refs.form.validate()) {

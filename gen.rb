@@ -49,8 +49,17 @@ class Generator
     File.write(DST_DIR + ROUTES_FILE, import + routes)
   end
 
-  def build_tag(tag, name, label, required)
-    "<#{tag} v-model='#{name}' label='#{label}' #{required}></#{tag}>"
+  def build_tag(tag, name, label, required, rules)
+    rule = ":rules='#{rules}'" unless rules.empty?
+    "<#{tag} v-model='#{name}' #{rule} label='#{label}' #{required}></#{tag}>"
+  end
+
+  def build_data(data)
+    data_str = ""
+    data.each do |k, v|
+      data_str << "#{k}: #{v},"
+    end
+    "{#{data_str}}"
   end
 
   def generate_with(page)
@@ -68,6 +77,7 @@ class Generator
     pagesrc.gsub!('BODY', body.join("\n"))
 
     # FORM GENERATION 
+    data = {}
     unless page.forms.flatten.empty?
       form_src = page.forms.map do |form|
         next if form.empty?
@@ -78,11 +88,29 @@ class Generator
         name = form[3]
         label = form[4]
         required = form[2].delete('(').delete(')')
-        build_tag('v-text-field', name, label, required)
+        data[name] = '\'\''
+        rules = ''
+        ## MAKE RULES FOR VALIDATION
+        unless required.empty?
+          case form[1]
+          when 'email'
+            data['emailRules'] = "[v => !!v || 'Email is required', v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email must be valid']"
+            rules = 'emailRules'
+          when 'text'
+            data['textRules'] = "[v => !!v || 'Text is required']" 
+            rules = 'textRules'
+          when 'password'
+            data['passwordRules'] = "[v => !!v || 'Password is required']" 
+            data['mask'] = true
+            rules = 'passwordRules'
+          end
+        end
+        build_tag('v-text-field', name, label, required, rules)
       end
       form_src.unshift("<v-form v-model='valid' lazy-validation>")
       form_src << "</v-form>"
       pagesrc.gsub!('===FORM===', form_src.join)
+      data['valid'] = true
     else
       pagesrc.gsub!('===FORM===', '')
     end
@@ -94,6 +122,8 @@ class Generator
       "<router-link to='/#{trn[2].downcase.strip}'>#{trn.first}</router-link>/"
     end
     pagesrc.gsub!('===LINK===', trs.join)
+
+    pagesrc.gsub!('===DATA===', build_data(data))
 
     File.write(page_file, pagesrc)
 
