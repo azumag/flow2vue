@@ -28,7 +28,7 @@ class Generator
   PAGE_TEMPLATE_FILE = '/src/components/page.vue'
 
   def generate_scaffold
-    FileUtils.rm_r(DST_DIR)
+    FileUtils.rm_r(DST_DIR) if File.exist?(DST_DIR)
     FileUtils.cp_r(SRC_DIR, DST_DIR)
   end
 
