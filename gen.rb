@@ -51,12 +51,16 @@ class Generator
     File.write(DST_DIR + ROUTES_FILE, import + routes)
   end
 
+  def build_tag(tag, name, label, required)
+    "<#{tag} v-model='#{name}' label='#{label}' #{required}></#{tag}>"
+  end
+
   def generate_with(page)
     # page
     page_file =  DST_DIR + "/src/#{page.name}.vue"
     FileUtils.cp(SRC_DIR + PAGE_TEMPLATE_FILE, page_file)
     pagesrc = File.read(page_file)
-    pagesrc.gsub!('page', page.name.downcase)
+    pagesrc.gsub!('PAGE_ID', page.name.downcase)
     pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
 
     # BODY GENERATION
@@ -69,10 +73,16 @@ class Generator
     unless page.forms.flatten.empty?
       form_src = page.forms.map do |form|
         next if form.empty?
+        next if form[0] != "Input"
         form[2] = '' unless form[2]
-        "<v-text-field v-model='#{form[3]}' label='#{form[4]}' #{form[2].delete('(').delete(')')}></v-text-field>"
+        # FORMAT;
+        # ["Input", "email", "(required)", "Email", "メール"]
+        name = form[3]
+        label = form[4]
+        required = form[2].delete('(').delete(')')
+        build_tag('v-text-field', name, label, required)
       end
-      form_src.unshift("<v-form>")
+      form_src.unshift("<v-form v-model='valid' lazy-validation>")
       form_src << "</v-form>"
       pagesrc.gsub!('===FORM===', form_src.join)
     else
@@ -177,7 +187,7 @@ page_scans.each do |page_scan|
   gen.add_routes(page)
   gen.generate_with(page) 
 
-  pp page
+#  pp page
 end
 
 
