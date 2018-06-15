@@ -2,8 +2,6 @@
 
 require 'fileutils'
 
-flow = File.read(ARGV[0])
-flow << "\n" # insert \n for easy parsing
 APP_TITLE = ARGV[1] || 'NO TITLE'
 
 class Page
@@ -132,12 +130,16 @@ gen.generate_scaffold unless File.exist?('dst')
 gen.rewrite_app_title
 gen.copy_routes
 
+flow = File.read(ARGV[0])
+flow << "\n" # insert \n for easy parsing
+flow.delete!("\r")
 page_scans = flow.scan(/\[(.*)\]/).flatten
 
 pages = []
 page_scans.each do |page_scan|
   puts "------#{page_scan}"
   page_body = flow.scan(/^\[#{page_scan.gsub('*','\*')}\]$(.*?)(^\[|^\n)/m)
+  #pp page_body
   transitions = []
  
   ## parse transitions
