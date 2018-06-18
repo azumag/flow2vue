@@ -119,7 +119,7 @@ class Generator
     trs = page.transitions.map do |trn|
       next unless trn
       # TODO: structurize
-      "<router-link to='/#{trn[2].strip.gsub(/^\*/,'').downcase}'>#{trn.first}</router-link>/"
+      "<router-link to='/#{trn[2].strip.sub(/^\*/,'').downcase}'>#{trn.first}</router-link>/"
     end
     pagesrc.gsub!('===LINK===', trs.join)
 
