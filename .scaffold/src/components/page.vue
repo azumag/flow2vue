@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'page',
+  name: 'PAGE_ID',
   data: () => (
     ===DATA===
   ), 
