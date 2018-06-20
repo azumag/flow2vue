@@ -1,7 +1,7 @@
 <template>
   <div id="PAGE_ID">
     <h2>PAGE_NAME</h2>
-    <p>BODY</p>
+    <p>===BODY===</p>
     <p>===FORM===</p>
     <p>===LINK===</p>
   </div>

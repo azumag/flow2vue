@@ -74,7 +74,7 @@ class Generator
     body = page.body.map do |line|
       "<div>#{line}</div>"
     end
-    pagesrc.gsub!('BODY', body.join("\n"))
+    pagesrc.gsub!('===BODY===', body.join("\n"))
 
     # FORM GENERATION 
     data = {}
