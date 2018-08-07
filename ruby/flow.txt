@@ -1,0 +1,30 @@
+[Entry]
+Title(EntryPage and tutorial)
+BODY
+BODY2
+---
+Tutor
+==> Tutorial
+Logi--n
+==> Login
+
+[Tutorial]
+Title(Tutorial)
+
+[PasswordReset]
+Title(Password Reset)
+
+[SignUp]
+Title(snup)
+
+[Login]
+Title(Login)
+(Input:email)(required)MailAddress:メールアドレス
+(Input:password)(required)Password:パスワード
+---
+ログイン
+={if:valid}=> OrderForm
+パスワードを忘れた方はこちら
+==> PasswordReset
+新規登録
+==> SignUp
