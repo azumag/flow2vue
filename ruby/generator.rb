@@ -36,7 +36,7 @@ class Generator
       FileUtils.cp(SRC_DIR + APP_FILE, DST_DIR + APP_FILE)
       app = File.read(DST_DIR + APP_FILE)
       app.gsub!('APP_TITLE', title)
-      File.write(DST_DIR + title, app)
+      File.write(DST_DIR + APP_FILE, app)
     end
 
     def copy_routes
@@ -111,7 +111,7 @@ class Generator
         end
         form_src.unshift("<v-form v-model='valid' lazy-validation>")
         form_src << "</v-form>"
-        pagesrc.gsub!('===FORM===', form_src.join)
+        pagesrc.gsub!('===FORM===', form_src.join("\n"))
         data['valid'] = true
       else
         pagesrc.gsub!('===FORM===', '')
@@ -124,7 +124,7 @@ class Generator
         #"<router-link to='/#{trn[2].strip.sub(/^\*/,'').downcase}'>#{trn.first}</router-link>/"
         "<v-btn @click='$router.push(\"/#{trn[2].strip.sub(/^\*/,'').downcase}\")'>#{trn.first}</v-btn>"
       end
-      pagesrc.gsub!('===LINK===', trs.join)
+      pagesrc.gsub!('===LINK===', trs.join("\n"))
 
       pagesrc.gsub!('===DATA===', build_data(data))
 
