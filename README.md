@@ -2,8 +2,9 @@
 The webpack config has been removed!
 If you want to use it with webpack, please use old version by docker-image:
 ```
- docker run -v $(pwd):/usr/src/app -t azumag/vuegen flow.txt test
+ docker run -v $(pwd):/usr/src/app/mount azumag/vuegen mount/flows.txt title
 ```
+ 
 
 
 # Run with docker
