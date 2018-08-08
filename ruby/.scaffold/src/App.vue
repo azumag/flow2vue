@@ -49,7 +49,7 @@
     </v-container>
   </v-content>
   <v-footer color="indigo" app inset>
-    <span class="white--text">&copy; 2018 Around The World Trading </span>
+    <span class="white--text"></span>
   </v-footer>
 </v-app>
 </div>
