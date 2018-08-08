@@ -5,6 +5,7 @@ require 'fileutils'
 class Generator
   DST_DIR = 'dst'
   SRC_DIR = '.scaffold'
+  BASE_DIR = '/base'
 
   APP_FILE = '/src/App.vue'
   ROUTES_FILE = '/src/routes.js'
@@ -12,41 +13,48 @@ class Generator
 
   class << self
 
-    def generate(pages, mode: nil, title: 'NO_TITLE', params)
-      case mode
-      when :rewrite
+    def generate(pages, params)
+      rewrite = params['f']
+      
+      if rewrite 
         generate_scaffold 
       else
-        generate_scaffold unless File.exist?('dst')
+        if File.exist?('dst')
+          puts "The 'dst' directory is already exist."
+          puts "Please use -f option or delete the dst directory."
+          exit 1
+        end
       end
-      copy_routes unless params[:nuxt]
+      copy_routes if params['nonuxt']
       pages.each do |page|
-        add_routes(page) unless params[:nuxt]
-        generate_with(page) 
+        add_routes(page) if params['nonuxt']
+        generate_with(page, params) 
       end
+
+      title = params['t']
       rewrite_app_title(title) if title
     end
 
     def generate_scaffold
       FileUtils.rm_r(DST_DIR) if File.exist?(DST_DIR)
-      FileUtils.cp_r(SRC_DIR, DST_DIR)
+      FileUtils.cp_r(SRC_DIR + BASE_DIR, DST_DIR)
     end
 
     def rewrite_app_title(title)
-      FileUtils.cp(SRC_DIR + APP_FILE, DST_DIR + APP_FILE)
+      FileUtils.cp(SRC_DIR + BASE_DIR + APP_FILE, DST_DIR + APP_FILE)
       app = File.read(DST_DIR + APP_FILE)
       app.gsub!('APP_TITLE', title)
       File.write(DST_DIR + APP_FILE, app)
     end
 
     def copy_routes
-      FileUtils.cp(SRC_DIR + ROUTES_FILE, DST_DIR + ROUTES_FILE)
+      FileUtils.cp(SRC_DIR + BASE_DIR + ROUTES_FILE, DST_DIR + ROUTES_FILE)
     end
 
     def add_routes(page)
       routes = File.read(DST_DIR + ROUTES_FILE)
       import = "import #{page.name} from './#{page.name}';\n"
-      components = "\n},\n{\n path: '/#{page.name.downcase}', component: #{page.name} },\n]"
+      components = "\n},\n{\n path: '/#{page.name.to_snake}', component: #{page.name} },\n]"
       routes.gsub!(/\},\n\]/, components)
       File.write(DST_DIR + ROUTES_FILE, import + routes)
     end
@@ -64,10 +72,10 @@ class Generator
       "{#{data_str}}"
     end
 
-    def generate_with(page)
+    def generate_with(page, params)
       # page
       page_file =  DST_DIR + "/src/#{page.name}.vue"
-      FileUtils.cp(SRC_DIR + PAGE_TEMPLATE_FILE, page_file)
+      FileUtils.cp(SRC_DIR + BASE_DIR + PAGE_TEMPLATE_FILE, page_file)
       pagesrc = File.read(page_file)
       pagesrc.gsub!('PAGE_ID', page.name.downcase)
       pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name

@@ -10,9 +10,11 @@
 <script>
 export default {
   name: 'PAGE_ID',
-  data: () => (
-    ===DATA===
-  ), 
+  data() {
+    return {
+      ===DATA===
+    }
+  } 
 }
 </script>
 

@@ -3,22 +3,22 @@
 require 'fileutils'
 require 'optparse'
 
+require './string_helper'
 require './generator'
 require './page'
 require './parser'
 
 # TODO: intaractive specifying
 # ignore route generation if Nuxt
+# -t : title
+# -i : input file
 params = ARGV.getopts(
-  ':', 
-  'demo',
-  'vuetify',
-  'coreui',
-  'nuxt',
-  'page-only',
-  'navbar',
+  't:fi:', 
+  'nonuxt',
+  'novuetify',
 )
 
-gen = Generator.generate(Parser.parse(ARGV[0]), mode: :rewrite, title: ARGV[1], params)
+p params
 
+Generator.generate(Parser.parse(params['i']), params)
 

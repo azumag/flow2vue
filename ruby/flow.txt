@@ -5,7 +5,7 @@ BODY2
 ---
 Tutor
 ==> Tutorial
-Logi--n
+Login
 ==> Login
 
 [Tutorial]
@@ -14,17 +14,20 @@ Title(Tutorial)
 [PasswordReset]
 Title(Password Reset)
 
-[SignUp]
+[Signup]
 Title(snup)
 
 [Login]
-Title(Login)
+Title(login)
 (Input:email)(required)MailAddress:メールアドレス
 (Input:password)(required)Password:パスワード
 ---
 ログイン
-={if:valid}=> OrderForm
+={if:valid}=> Mypage
 パスワードを忘れた方はこちら
 ==> PasswordReset
 新規登録
 ==> SignUp
+
+[Mypage]
+Title(my page)
