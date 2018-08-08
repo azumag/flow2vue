@@ -77,7 +77,7 @@ class Generator
       page_file =  DST_DIR + "/src/#{page.name}.vue"
       FileUtils.cp(SRC_DIR + BASE_DIR + PAGE_TEMPLATE_FILE, page_file)
       pagesrc = File.read(page_file)
-      pagesrc.gsub!('PAGE_ID', page.name.downcase)
+      pagesrc.gsub!('PAGE_ID', page.name)
       pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
 
       # BODY GENERATION
