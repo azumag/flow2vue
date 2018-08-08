@@ -12,16 +12,16 @@ class Generator
 
   class << self
 
-    def generate(pages, mode: nil, title: 'NO_TITLE')
+    def generate(pages, mode: nil, title: 'NO_TITLE', params)
       case mode
       when :rewrite
         generate_scaffold 
       else
         generate_scaffold unless File.exist?('dst')
       end
-      copy_routes
+      copy_routes unless params[:nuxt]
       pages.each do |page|
-        add_routes(page)
+        add_routes(page) unless params[:nuxt]
         generate_with(page) 
       end
       rewrite_app_title(title) if title
