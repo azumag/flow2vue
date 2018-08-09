@@ -26,9 +26,9 @@ class Generator
           exit 1
         end
       end
-      copy_routes if params['nonuxt']
+      copy_routes #if params['nonuxt']
       pages.each do |page|
-        add_routes(page) if params['nonuxt']
+        add_routes(page) #if params['nonuxt']
         generate_with(page, params) 
       end
 
