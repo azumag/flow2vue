@@ -1,0 +1,36 @@
+[Entry]
+Title(EntryPage and tutorial)
+BODY
+BODY2
+---
+Tutor
+==> Tutorial
+Login
+==> Login
+
+[Tutorial]
+Title(Tutorial)
+
+[PasswordReset]
+Title(Password Reset)
+
+[Signup]
+Title(snup)
+
+[Login]
+Title(login)
+(Input:email)(required)MailAddress:メールアドレス
+(Input:password)(required)Password:パスワード
+---
+ログイン
+={if:valid}=> Mypage
+パスワードを忘れた方はこちら
+==> PasswordReset
+新規登録
+==> SignUp
+
+[Mypage]
+Title(my page)
+
+[*NyanPage]
+Title(nyan page)
