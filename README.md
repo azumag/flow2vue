@@ -1,19 +1,30 @@
+# Welcome
+This script allows us to convert uiflow format to vue code.
+- Ver 0.01: Only ruby version is implemented
+
+# Usage
+example:
+```
+cd ruby
+ruby -Ku main.rb -t title -i flow.txt --cli2
+```
+
+### options
+- `-t` TITLE of application
+- `-i` input file
+- `--cli2` use scaffold with vue-cli2's settings
+- `-f` rewrite mode if dst directory exists
+- `--pageonly` rewrite `dst/src` only
+
 # NOTICE
-The webpack config has been removed!
-If you want to use it with webpack, please use old version by docker-image:
+If you want to use old version, please use the docker-image as follows:
 ```
  docker run -v $(pwd):/usr/src/app/mount azumag/vuegen mount/flows.txt title
 ```
  
-
-
 # Run with docker
+example:
+```
+docker run --rm -it -u $(id -u):$(id -g) -v $(pwd):/usr/src/app -w /usr/src/app ruby ruby -Ku main.rb -t title -i flow.txt -f --cli2 --pageonly
+```
 
-```
-docker run --rm -it -v $(pwd):/usr/src/app -w /usr/src/app ruby ruby -Ku gen.rb <TEMPLATE_FILENAME(guiflow)> "APP_TITLE"
-```
-
-# usage
-```
-ruby -Ku gen.rb <TEMPLATE_FILENAME(guiflow)> "APP_TITLE"
-```
