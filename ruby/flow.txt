@@ -31,3 +31,6 @@ Title(login)
 
 [Mypage]
 Title(my page)
+
+[*NyanPage]
+Title(nyan page)

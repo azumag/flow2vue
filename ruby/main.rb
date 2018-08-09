@@ -16,6 +16,8 @@ params = ARGV.getopts(
   't:fi:', 
   'nonuxt',
   'novuetify',
+  'cli2',
+  'pageonly',
 )
 
 p params
