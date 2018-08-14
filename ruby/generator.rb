@@ -14,6 +14,8 @@ class Generator
   PAGE_TEMPLATE_FILE = '/src/components/page.vue'
 
   VUETIFY_VERSION = '^1.1.11'
+  MATELIAL_ICON_VERSION = '^3.0.3'
+  VUE_AWESOME_VERSION = '^3.1.0'
 
   class << self
 
@@ -30,7 +32,9 @@ class Generator
         end
       end
 
-      add_package if params['vuetify']
+      add_packages(params)
+
+      add_imports(params)
 
       copy_routes #if params['nonuxt']
       pages.each do |page|
@@ -42,9 +46,34 @@ class Generator
       rewrite_app_title(title) if title
     end
 
-    def add_package
+    def add_imports(params)
+      main_src = File.read(DST_DIR + '/src/main.js')
+      imports = []
+      usings  = []
+      if params['vuetify']
+        imports << "import Vuetify from 'vuetify'"
+        imports << "import 'vuetify/dist/vuetify.min.css'"
+        imports << "import 'vue-awesome/icons/flag'"
+        imports << "import 'vue-awesome/icons'"
+        imports << "import Icon from 'vue-awesome/components/Icon'" 
+        imports << "import 'material-design-icons-iconfont/dist/material-design-icons.css'"
+
+        usings << "Vue.use(Vuetify)"
+        usings << "Vue.component('icon', Icon)"
+      end
+
+      main_src.gsub!('// -- additional imports', imports.join("\n"))
+      main_src.gsub!('// -- additional usings', usings.join("\n"))
+
+      File.write(DST_DIR + '/src/main.js', main_src)
+    end
+
+    def add_packages(params)
+      return unless params['vuetify']
       package_json = JSON.parse(File.read(DST_DIR + '/package.json'))
       package_json['dependencies']["vuetify"] = VUETIFY_VERSION
+      package_json['dependencies']["material-design-icons-iconfont"] = MATELIAL_ICON_VERSION
+      package_json['dependencies']["vue-awesome"] = VUE_AWESOME_VERSION
       File.write(DST_DIR + '/package.json', JSON.pretty_generate(package_json))
     end
 
@@ -78,8 +107,8 @@ class Generator
 
     def build_input(name, label, required, rules, params)
       rule = ":rules='#{rules}'" unless rules.empty?
-      if params['--vuetify']
-        "<v-text-input v-model='#{name}' #{rule} label='#{label}' #{required}></v-text-input>"
+      if params['vuetify']
+        "<v-text-field v-model='#{name}' #{rule} label='#{label}' #{required}></v-text-field>"
       else
         "<div><label>#{name}</label><input /></div>"
       end

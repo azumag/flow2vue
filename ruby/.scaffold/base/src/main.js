@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 
 // -- additional imports
 
-// -- use
+// -- additional usings
 Vue.use(VueRouter)
 
 const router = new VueRouter({
