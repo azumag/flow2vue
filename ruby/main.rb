@@ -18,6 +18,7 @@ params = ARGV.getopts(
   'novuetify',
   'cli2',
   'pageonly',
+  'vuetify'
 )
 
 p params

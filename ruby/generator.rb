@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'fileutils'
+require 'json'
 
 class Generator
   DST_DIR = 'dst'
@@ -11,6 +12,8 @@ class Generator
   APP_FILE = '/src/App.vue'
   ROUTES_FILE = '/src/routes.js'
   PAGE_TEMPLATE_FILE = '/src/components/page.vue'
+
+  VUETIFY_VERSION = '^1.1.11'
 
   class << self
 
@@ -26,6 +29,9 @@ class Generator
           exit 1
         end
       end
+
+      add_package if params['vuetify']
+
       copy_routes #if params['nonuxt']
       pages.each do |page|
         add_routes(page) #if params['nonuxt']
@@ -34,6 +40,12 @@ class Generator
 
       title = params['t']
       rewrite_app_title(title) if title
+    end
+
+    def add_package
+      package_json = JSON.parse(File.read(DST_DIR + '/package.json'))
+      package_json['dependencies']["vuetify"] = VUETIFY_VERSION
+      File.write(DST_DIR + '/package.json', JSON.pretty_generate(package_json))
     end
 
     def generate_scaffold(params)
@@ -64,10 +76,13 @@ class Generator
       File.write(DST_DIR + ROUTES_FILE, import + routes)
     end
 
-    def build_tag(tag, name, label, required, rules)
+    def build_input(name, label, required, rules, params)
       rule = ":rules='#{rules}'" unless rules.empty?
-      #"<#{tag} v-model='#{name}' #{rule} label='#{label}' #{required}></#{tag}>"
-      "<div><label>#{name}</label><#{tag} /></div>"
+      if params['--vuetify']
+        "<v-text-input v-model='#{name}' #{rule} label='#{label}' #{required}></v-text-input>"
+      else
+        "<div><label>#{name}</label><input /></div>"
+      end
     end
 
     def build_data(data)
@@ -126,7 +141,7 @@ class Generator
          # end
 
           #build_tag('v-text-field', name, label, required, rules)
-          build_tag('input', name, label, nil, rules)
+          build_input(name, label, nil, rules, params)
         end
         #form_src.unshift("<v-form v-model='valid' lazy-validation>")
         form_src.unshift("<form>")
