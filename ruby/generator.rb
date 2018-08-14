@@ -36,6 +36,8 @@ class Generator
 
       add_imports(params)
 
+      rewrite_top_tags(params)
+
       copy_routes #if params['nonuxt']
       pages.each do |page|
         add_routes(page) #if params['nonuxt']
@@ -44,6 +46,17 @@ class Generator
 
       title = params['t']
       rewrite_app_title(title) if title
+    end
+
+    def switch_template(params)
+      app = File.read(DST_DIR + APP_FILE)
+      if params['vuetify']
+        app.gsub!('')
+      else
+      end
+
+      app.gsub!('APP_TITLE', title)
+      File.write(DST_DIR + APP_FILE, app)
     end
 
     def add_imports(params)
@@ -154,20 +167,20 @@ class Generator
           data[name] = '\'\''
           rules = ''
           ## MAKE RULES FOR VALIDATION
-         # unless required.empty?
-         #   case form[1]
-         #   when 'email'
-         #     data['emailRules'] = "[v => !!v || 'Email is required', v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email must be valid']"
-         #     rules = 'emailRules'
-         #   when 'text'
-         #     data['textRules'] = "[v => !!v || 'Text is required']" 
-         #     rules = 'textRules'
-         #   when 'password'
-         #     data['passwordRules'] = "[v => !!v || 'Password is required']" 
-         #     data['mask'] = true
-         #     rules = 'passwordRules'
-         #   end
-         # end
+          unless required.empty?
+            case form[1]
+            when 'email'
+              data['emailRules'] = "[v => !!v || 'Email is required', v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email must be valid']"
+              rules = 'emailRules'
+            when 'text'
+              data['textRules'] = "[v => !!v || 'Text is required']" 
+              rules = 'textRules'
+            when 'password'
+              data['passwordRules'] = "[v => !!v || 'Password is required']" 
+              data['mask'] = true
+              rules = 'passwordRules'
+            end
+          end
 
           #build_tag('v-text-field', name, label, required, rules)
           build_input(name, label, nil, rules, params)
