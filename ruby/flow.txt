@@ -29,8 +29,10 @@ Title(login)
 新規登録
 ==> SignUp
 
-[Mypage]
+[*Mypage]
 Title(my page)
 
-[*NyanPage]
-Title(nyan page)
+[*FAQ]
+Title(FAQ)
+
+

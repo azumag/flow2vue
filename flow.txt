@@ -5,7 +5,7 @@ BODY2
 ---
 Tutor
 ==> Tutorial
-Logi--n
+Login
 ==> Login
 
 [Tutorial]
@@ -28,3 +28,10 @@ Title(Login)
 ==> PasswordReset
 新規登録
 ==> SignUp
+
+
+[*Menu]
+Title(menu)
+
+[*FAQ]
+Title(FAQ)

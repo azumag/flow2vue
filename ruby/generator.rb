@@ -46,7 +46,6 @@ class Generator
     end
 
     def rewrite_app_title(title)
-      FileUtils.cp(SRC_DIR + BASE_DIR + APP_FILE, DST_DIR + APP_FILE)
       app = File.read(DST_DIR + APP_FILE)
       app.gsub!('APP_TITLE', title)
       File.write(DST_DIR + APP_FILE, app)
@@ -163,9 +162,11 @@ class Generator
       tile = []
       if true
         tile << "<div>"
-        tile << "<router-link to=\"$router.push('/#{page.name.to_snake}')\">"
+        # tile << "<a @click=\"$router.push('/#{page.name.to_snake}')\">"
+        tile << "<router-link to=\"/#{page.name.to_snake}\">"
         tile << "#{page.display_name}"
         tile << "</router-link>"
+        # tile << "</a>"
         tile << "</div>"
       else
         tile << "<v-list-tile @click=\"$router.push('/#{page.name.to_snake}')\">"
@@ -181,10 +182,10 @@ class Generator
         tile << "</v-list>"
       end
 
-      tile << "<!-- NAVBAR --//>"
+      tile << "<!-- NAVBAR -->"
       pagesrc.gsub!('<!-- NAVBAR -->', tile.join("\n"))
 
-      File.write('dst/src/App.vue', pagesrc)
+      File.write(page_file, pagesrc)
     end
   end
 end
