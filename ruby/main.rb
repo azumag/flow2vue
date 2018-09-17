@@ -13,14 +13,15 @@ require './parser'
 # -t : title
 # -i : input file
 params = ARGV.getopts(
-  't:fi:', 
+  't:fi:',
   'nonuxt',
   'novuetify',
   'cli2',
   'pageonly',
+  'vuetify',
+  'dark'
 )
 
 p params
 
 Generator.generate(Parser.parse(params['i']), params)
-
