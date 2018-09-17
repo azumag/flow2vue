@@ -10,6 +10,7 @@ class Generator
   CLI2_DIR = '/cli2'
 
   APP_FILE = '/src/App.vue'
+  APP_VUETIFY_FILE = '/src_vuetify/App.vue'
   ROUTES_FILE = '/src/routes.js'
   PAGE_TEMPLATE_FILE = '/src/components/page.vue'
 
@@ -21,8 +22,8 @@ class Generator
 
     def generate(pages, params)
       rewrite = params['f']
-      
-      if rewrite 
+
+      if rewrite
         generate_scaffold(params)
       else
         if File.exist?('dst')
@@ -36,27 +37,37 @@ class Generator
 
       add_imports(params)
 
-      rewrite_top_tags(params)
+      select_template(params)
 
       copy_routes #if params['nonuxt']
       pages.each do |page|
         add_routes(page) #if params['nonuxt']
-        generate_with(page, params) 
+        generate_with(page, params)
       end
 
       title = params['t']
       rewrite_app_title(title) if title
     end
 
-    def switch_template(params)
-      app = File.read(DST_DIR + APP_FILE)
-      if params['vuetify']
-        app.gsub!('')
-      else
-      end
+    def rewrite_top_tags(params)
+      return unless params['vuetify']
 
-      app.gsub!('APP_TITLE', title)
-      File.write(DST_DIR + APP_FILE, app)
+    end
+
+    def select_template(params)
+      destination_file = DST_DIR + APP_FILE
+
+      src_file =
+        if params['vuetify']
+          SRC_DIR + BASE_DIR + APP_VUETIFY_FILE
+        else
+          SRC_DIR + BASE_DIR + APP_FILE
+        end
+
+      app = File.read(src_file)
+
+      # app.gsub!('APP_TITLE', title)
+      File.write(destination_file, app)
     end
 
     def add_imports(params)
@@ -68,7 +79,7 @@ class Generator
         imports << "import 'vuetify/dist/vuetify.min.css'"
         imports << "import 'vue-awesome/icons/flag'"
         imports << "import 'vue-awesome/icons'"
-        imports << "import Icon from 'vue-awesome/components/Icon'" 
+        imports << "import Icon from 'vue-awesome/components/Icon'"
         imports << "import 'material-design-icons-iconfont/dist/material-design-icons.css'"
 
         usings << "Vue.use(Vuetify)"
@@ -92,10 +103,10 @@ class Generator
 
     def generate_scaffold(params)
       unless params['pageonly']
-        FileUtils.rm_r(DST_DIR) if File.exist?(DST_DIR)
-        FileUtils.copy_entry(SRC_DIR + CLI2_DIR, DST_DIR) if params['cli2'] 
+        FileUtils.rm_rf(DST_DIR) if File.exist?(DST_DIR)
+        FileUtils.copy_entry(SRC_DIR + CLI2_DIR, DST_DIR) if params['cli2']
       end
-      FileUtils.rm_r(DST_DIR + '/src') if File.exist?(DST_DIR + '/src')
+      FileUtils.rm_rf(DST_DIR + '/src') if File.exist?(DST_DIR + '/src')
       FileUtils.copy_entry(SRC_DIR + BASE_DIR, DST_DIR)
     end
 
@@ -132,7 +143,7 @@ class Generator
       data.each do |k, v|
         data_str << "#{k}: #{v}"
       end
-      
+
       if data_str.empty?
         ''
       else
@@ -152,7 +163,7 @@ class Generator
       body = page.body.map {|line| "<div>#{line}</div>" }
       pagesrc.gsub!('===BODY===', body.join("\n"))
 
-      # FORM GENERATION 
+      # FORM GENERATION
       data = {}
       unless page.forms.flatten.empty?
         form_src = page.forms.map do |form|
@@ -173,10 +184,10 @@ class Generator
               data['emailRules'] = "[v => !!v || 'Email is required', v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email must be valid']"
               rules = 'emailRules'
             when 'text'
-              data['textRules'] = "[v => !!v || 'Text is required']" 
+              data['textRules'] = "[v => !!v || 'Text is required']"
               rules = 'textRules'
             when 'password'
-              data['passwordRules'] = "[v => !!v || 'Password is required']" 
+              data['passwordRules'] = "[v => !!v || 'Password is required']"
               data['mask'] = true
               rules = 'passwordRules'
             end
@@ -209,15 +220,15 @@ class Generator
 
       File.write(page_file, pagesrc)
 
-      add_navbar(page) if page.independent
+      add_navbar(page, params) if page.independent
     end
 
-    def add_navbar(page)
+    def add_navbar(page, params)
       page_file =  "dst/src/App.vue"
       pagesrc = File.read(page_file)
 
       tile = []
-      if true
+      unless params['vuetify']
         tile << "<div>"
         # tile << "<a @click=\"$router.push('/#{page.name.to_snake}')\">"
         tile << "<router-link to=\"/#{page.name.to_snake}\">"
@@ -227,24 +238,21 @@ class Generator
         tile << "</div>"
       else
         tile << "<v-list-tile @click=\"$router.push('/#{page.name.to_snake}')\">"
-        tile << "<v-list-tile-action>"
-        tile << "<v-icon>link</v-icon>" # TODO
-        tile << "</v-list-tile-action>"
-        tile << "<v-list-tile-content>"
-        tile << "<v-list-tile-title>"
-        tile << "#{page.display_name}"
-        tile << "</v-list-tile-title>"
-        tile << "</v-list-tile-content>"
-        tile << "</v-list-tile>"
-        tile << "</v-list>"
+        tile << "            <v-list-tile-action>"
+        tile << "            <v-icon>link</v-icon>" # TODO
+        tile << "          </v-list-tile-action>"
+        tile << "          <v-list-tile-content>"
+        tile << "            <v-list-tile-title>"
+        tile << "              #{page.display_name}"
+        tile << "            </v-list-tile-title>"
+        tile << "          </v-list-tile-content>"
+        tile << "        </v-list-tile>"
       end
 
-      tile << "<!-- NAVBAR -->"
+      tile << "          <!-- NAVBAR -->"
       pagesrc.gsub!('<!-- NAVBAR -->', tile.join("\n"))
 
       File.write(page_file, pagesrc)
     end
   end
 end
-
-
