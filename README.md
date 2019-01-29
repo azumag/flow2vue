@@ -7,6 +7,7 @@ example:
 ```
 cd ruby
 ruby -Ku main.rb -t title -i flow.txt --cli2
+｀--cli2｀ オプションは，古い vue 2 のライブラリを使ってしまうので，最初に動かして見るぶんにはいいですが，PJ土台を作るならば ｀--cli2｀ なしでやったほうがよいかも
 ```
 
 ### options
