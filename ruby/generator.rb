@@ -23,10 +23,10 @@ class Generator
     def generate(pages, params)
       rewrite = params['f']
 
-      if rewrite
+      if rewrite || !FileTest.exist?('dst')
         generate_scaffold(params)
       else
-        if File.exist?('dst')
+        if FileTest.exist?('dst')
           puts "The 'dst' directory is already exist."
           puts "Please use -f option or delete the dst directory."
           exit 1

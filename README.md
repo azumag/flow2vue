@@ -3,18 +3,20 @@ This script allows us to convert uiflow format to vue code.
 - Ver 0.01: Only ruby version is implemented
 
 # Usage
-example:
+example for demo:
 ```
 cd ruby
-ruby -Ku main.rb -t title -i flow.txt --cli2
-｀--cli2｀ オプションは，古い vue 2 のライブラリを使ってしまうので，最初に動かして見るぶんにはいいですが，PJ土台を作るならば ｀--cli2｀ なしでやったほうがよいかも
+ruby -Ku main.rb -t title -i flow.txt --cli2 -f
 ```
+
+### notice:
+｀--cli2｀ オプションは古い vue 2 のライブラリを使ってしまうので，最初に動かして見るぶんにはいいですが，PJ土台を作るならば ｀--cli2｀ なしでやったほうがよいかも
 
 ### options
 - `-t` TITLE of application
 - `-i` input file
 - `--cli2` use scaffold with vue-cli2's settings
-- `-f` rewrite mode if dst directory exists
+- `-f` rewrite dst directory
 - `--pageonly` rewrite `dst/src` only
 
 # NOTICE
