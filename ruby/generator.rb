@@ -41,11 +41,11 @@ class Generator
 
       # select_template(params)
 
-      copy_routes unless params['nuxt']
-      pages.each do |page|
-        add_routes(page) #if params['nonuxt']
-        generate_with(page, params)
-      end
+      # copy_routes unless params['nuxt']
+      # pages.each do |page|
+        # add_routes(page) unless params['nuxt']
+        # generate_with(page, params)
+      # end
 
       # title = params['t']
       # rewrite_app_title(title) if title
