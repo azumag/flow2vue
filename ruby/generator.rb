@@ -8,6 +8,8 @@ class Generator
   SRC_DIR = '.scaffold'
   BASE_DIR = '/base'
   CLI2_DIR = '/cli2'
+  NUXT_DIR = '/nuxt'
+  NUXT_PAGE_DIR = '/nuxt-page'
 
   APP_FILE = '/src/App.vue'
   APP_VUETIFY_FILE = '/src_vuetify/App.vue'
@@ -33,25 +35,24 @@ class Generator
         end
       end
 
-      add_packages(params)
+      # add_packages(params)
 
-      add_imports(params)
+      # add_imports(params)
 
-      select_template(params)
+      # select_template(params)
 
-      copy_routes #if params['nonuxt']
+      copy_routes unless params['nuxt']
       pages.each do |page|
         add_routes(page) #if params['nonuxt']
         generate_with(page, params)
       end
 
-      title = params['t']
-      rewrite_app_title(title) if title
+      # title = params['t']
+      # rewrite_app_title(title) if title
     end
 
     def rewrite_top_tags(params)
       return unless params['vuetify']
-
     end
 
     def select_template(params)
@@ -102,12 +103,19 @@ class Generator
     end
 
     def generate_scaffold(params)
-      unless params['pageonly']
-        FileUtils.rm_rf(DST_DIR) if File.exist?(DST_DIR)
-        FileUtils.copy_entry(SRC_DIR + CLI2_DIR, DST_DIR) if params['cli2']
+      FileUtils.rm_rf(DST_DIR) if File.exist?(DST_DIR) unless params['pageonly']
+      if params['demo']
+        if params['cli2']
+          FileUtils.copy_entry(SRC_DIR + CLI2_DIR, DST_DIR) 
+        elsif params['nuxt']
+          FileUtils.copy_entry(SRC_DIR + NUXT_DIR, DST_DIR) 
+        end
       end
-      FileUtils.rm_rf(DST_DIR + '/src') if File.exist?(DST_DIR + '/src')
-      FileUtils.copy_entry(SRC_DIR + BASE_DIR, DST_DIR)
+      if params['nuxt']
+        FileUtils.copy_entry(SRC_DIR + NUXT_PAGE_DIR, DST_DIR)
+      else
+        FileUtils.copy_entry(SRC_DIR + BASE_DIR, DST_DIR)
+      end
     end
 
     def rewrite_app_title(title)

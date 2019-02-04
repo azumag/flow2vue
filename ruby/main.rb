@@ -14,10 +14,10 @@ require './parser'
 # -i : input file
 params = ARGV.getopts(
   't:fi:',
-  'nonuxt',
-  'novuetify',
-  'cli2',
+  'demo',
   'pageonly',
+  'nuxt',
+  'cli2',
   'vuetify',
   'dark'
 )
