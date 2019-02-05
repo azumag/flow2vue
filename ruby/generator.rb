@@ -41,11 +41,11 @@ class Generator
 
       # select_template(params)
 
-      # copy_routes unless params['nuxt']
-      # pages.each do |page|
-        # add_routes(page) unless params['nuxt']
-        # generate_with(page, params)
-      # end
+      copy_routes unless params['nuxt']
+      pages.each do |page|
+        add_routes(page) unless params['nuxt']
+        generate_with(page, params)
+      end
 
       # title = params['t']
       # rewrite_app_title(title) if title
@@ -159,7 +159,21 @@ class Generator
       end
     end
 
+    def generate_with_nuxt(page, params)
+      page_dir = DST_DIR + '/pages'
+      page_dir << '/' << page.name  unless page.name == 'Entry'
+      page_file = page_dir + '/index.vue'
+      FileUtils.mkdir(page_dir) unless FileTest.exist?(page_dir)
+      FileUtils.cp(SRC_DIR + NUXT_PAGE_DIR + '/pages/index.vue', page_file)
+      pagesrc = File.read(page_file)
+      pagesrc.gsub!('PAGE_ID', page.name)
+      pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
+
+      File.write(page_file, pagesrc)
+    end
+
     def generate_with(page, params)
+      return generate_with_nuxt(page, params) if params['nuxt']
       # page
       page_file =  DST_DIR + "/src/#{page.name}.vue"
       FileUtils.cp(SRC_DIR + BASE_DIR + PAGE_TEMPLATE_FILE, page_file)

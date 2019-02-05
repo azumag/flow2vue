@@ -1,12 +1,9 @@
 <template lang='pug'>
 v-layout(column, justify-center, align-center)
   v-flex(xs12, sm8, md6)
-    .text-xs-center
-      logo
-      vuetify-logo
     v-card
       v-card-title.headline
-        | Welcome to the Vuetify + Nuxt.js template
+        | PAGE_NAME
       v-card-text
         p
           | Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.
