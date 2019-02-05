@@ -27,7 +27,7 @@ class Generator
 
       if rewrite || !FileTest.exist?('dst')
         generate_scaffold(params)
-      else
+      elsif !params['pageonly']
         if FileTest.exist?('dst')
           puts "The 'dst' directory is already exist."
           puts "Please use -f option or delete the dst directory."
@@ -139,7 +139,8 @@ class Generator
 
     def build_input(name, label, required, rules, params)
       rule = ":rules='#{rules}'" unless rules.empty?
-      if params['vuetify']
+      # if params['vuetify']
+      if true
         "<v-text-field v-model='#{name}' #{rule} label='#{label}' #{required}></v-text-field>"
       else
         "<div><label>#{name}</label><input /></div>"
@@ -161,13 +162,54 @@ class Generator
 
     def generate_with_nuxt(page, params)
       page_dir = DST_DIR + '/pages'
-      page_dir << '/' << page.name  unless page.name == 'Entry'
+      page_dir << '/' << page.name.to_snake  unless page.name == 'Entry'
       page_file = page_dir + '/index.vue'
       FileUtils.mkdir(page_dir) unless FileTest.exist?(page_dir)
       FileUtils.cp(SRC_DIR + NUXT_PAGE_DIR + '/pages/index.vue', page_file)
       pagesrc = File.read(page_file)
-      pagesrc.gsub!('PAGE_ID', page.name)
-      pagesrc.gsub!('PAGE_NAME', page.display_name) if page.display_name
+      pagesrc.gsub!('===PAGE_ID===', page.name)
+      pagesrc.gsub!('===PAGE_NAME===', page.display_name) if page.display_name
+
+      # BODY GENERATION
+      # using pug
+      # TODO: sophisticate indentation
+      body = page.body.map do |line| 
+        "        p #{line}"
+      end
+      pagesrc.gsub!('===BODY===', body.join("\n"))
+
+      # FORM GENERATION
+      data = {}
+      unless page.forms.flatten.empty?
+        form_src = page.forms.map do |form|
+          next if form.empty?
+          next if form[0] != "Input"
+          form[2] = '' unless form[2]
+          # FORMAT;
+          # ["Input", "email", "(required)", "Email", "メール"]
+          name = form[3]
+          label = form[4]
+          required = form[2].delete('(').delete(')')
+          "        " <<
+            build_input(name, label, nil, [], { 'vuetify': true })
+        end
+        form_src.unshift("        <form>")
+        form_src << "        </form>"
+        pagesrc.gsub!('===FORM===', form_src.compact.join("\n"))
+      else
+        pagesrc.gsub!('===FORM===', '')
+      end
+
+      # TRANSITIONS GENERATION
+      trs = page.transitions.map do |trn|
+        next unless trn
+        linkto = trn[2].strip.sub(/^\*/,'').to_snake
+        "        v-btn(color='primary', flat, nuxt, to='/#{linkto}')" <<
+        "          #{trn.first}"
+      end
+      pagesrc.gsub!('===LINK===', trs.join("\n"))
+
+      # pagesrc.gsub!('===DATA===', build_data(data))
 
       File.write(page_file, pagesrc)
     end

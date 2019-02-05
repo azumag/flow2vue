@@ -1,5 +1,5 @@
 <template lang='pug'>
-v-app(dark)
+v-app()
   v-navigation-drawer(v-model='drawer', :mini-variant='miniVariant', :clipped='clipped', fixed, app)
     v-list
       v-list-tile(v-for='(item, i) in items', :key='i', :to='item.to', router, exact)

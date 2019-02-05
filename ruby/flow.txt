@@ -27,7 +27,7 @@ Title(login)
 パスワードを忘れた方はこちら
 ==> PasswordReset
 新規登録
-==> SignUp
+==> Signup
 
 [*Mypage]
 Title(my page)
